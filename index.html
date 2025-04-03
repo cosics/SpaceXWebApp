@@ -1,0 +1,66 @@
+<body>
+  <!-- Title -->
+  <h1 style="display: none">SpaceX Launches</h1>
+
+  <!-- CSS file -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Launches -->
+  <button
+    class="button button-logout"
+    style="display: none"
+    id="logout-button"
+    onclick="logout()"
+  >
+    Logout
+  </button>
+  <button class="button" onclick="loadUserFavorites()">⭐ Show Favorites</button>
+  <div id="favorites-container"></div>
+  <div id="launches" style="display: none"></div>
+
+  <!-- Login & Register -->
+  <div id="login-and-register">
+    <h1>Login</h1>
+    <div class="inputs">
+      <input type="text" id="login-username" placeholder="Username" required />
+      <input
+        type="password"
+        id="login-password"
+        placeholder="Password"
+        required
+      />
+    </div>
+    <button class="button button-login">Login</button>
+
+    <div>Don't have an account?</div>
+    <button class="button button-register">Register</button>
+  </div>
+
+  <!-- <div id="login-and-register">
+    <h1>Login</h1>
+    <div class="inputs">
+      <input
+        type="text"
+        required
+        minlength="4"
+        maxlength="8"
+        placeholder="Username"
+      />
+      <input
+        type="password"
+        required
+        minlength="4"
+        maxlength="8"
+        placeholder="Password"
+      />
+    </div>
+
+    <button class="button button-login">Login</button>
+
+    <div>Don't have an account?</div>
+    <button class="button button-register">Register</button>
+  </div> -->
+
+  <!-- Script file -->
+  <script src="script.js"></script>
+</body>
