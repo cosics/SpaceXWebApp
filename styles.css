@@ -123,9 +123,24 @@ body {
     cursor: pointer;
 }
 .launch button {
-    background-color: red;
+    background-color: white;
     color: white;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
+}
+
+#favorites-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+
+.button-favourites {
+    background-color: lightyellow;
+    color: orange;
 }

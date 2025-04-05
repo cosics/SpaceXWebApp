@@ -205,7 +205,7 @@ function filterLaunches() {
 
   launches.forEach((launch) => {
     const name = launch.querySelector("h2").innerText.toLowerCase();
-    launch.style.display = name.includes(query) ? "block" : "none";
+    launch.style.display = name.includes(query) ? "flex" : "none";
   });
 }
 
@@ -232,7 +232,7 @@ async function fetchLaunches() {
                 ? `<img src="${launch.links.patch.small}" alt="Mission launch" />`
                 : ""
             }
-            <button class="favorite-button" onclick="toggleFavorite('${
+            <button class="favorite-button" onclick="addToFavorites('${
               launch.id
             }', this)">❤️</button>
         `;
@@ -337,7 +337,7 @@ function registerUser() {
 
 function showLaunches() {
   document.getElementById("login-and-register").style.display = "none";
-  document.getElementById("launches").style.display = "block";
+  document.getElementById("launches").style.display = "flex";
   document.getElementById("logout-button").style.display = "block";
   fetchLaunches();
 }
@@ -347,28 +347,29 @@ function logout() {
   location.reload();
 }
 
-function toggleFavorite(launchId, button) {
-  console.log(launchId);
+function addToFavorites(launchId) {
   const username = localStorage.getItem("loggedInUser");
   if (!username) {
     alert("You need to log in first!");
     return;
   }
 
-  fetch(`${API_BASE_URL}/favorites`, {
+  fetch("http://localhost:3000/favorites", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, launchId }),
   })
     .then((res) => res.json())
     .then((data) => {
+      console.log("Server response:", data);
       alert(data.message);
-      button.classList.toggle("favorited");
     })
-    .catch(() => {
+    .catch((err) => {
       console.error("Fetch error:", err);
       alert("Error adding to favorites.");
     });
+
+  loadUserFavorites();
 }
 
 async function loadUserFavorites() {
@@ -380,25 +381,34 @@ async function loadUserFavorites() {
 
   const response = await fetch(`http://localhost:3000/favorites/${username}`);
   const favorites = await response.json();
+  console.log("Favorites received:", favorites); // 🔍 Debugging
 
   if (!favorites.length) {
     alert("You have no favorite launches yet!");
     return;
   }
-  const launchesResponse = await fetch("https://api.spacexdata.com/v4/launches");
+  const launchesResponse = await fetch(
+    "https://api.spacexdata.com/v4/launches"
+  );
   const launches = await launchesResponse.json();
 
   const favoritesContainer = document.getElementById("favorites-container");
-  favoritesContainer.innerHTML = "<h2>Your Favorite Launches</h2>";
+//   favoritesContainer.innerHTML = "<h2>Your Favorite Launches</h2>";
 
   favorites.forEach((favId) => {
+    console.log("Checking launch ID:", favId); // 🛠 Debugging
     const launch = launches.find((l) => l.id === favId);
     if (launch) {
       const launchDiv = document.createElement("div");
       launchDiv.className = "launch";
       launchDiv.innerHTML = `
-            <h3>${launch.name}</h3>
-            <p>${launch.date_utc}</p>
+            <h2>${launch.name}</h2>
+            <p><strong>Date:</strong> ${new Date(
+              launch.date_utc
+            ).toLocaleDateString()}</p>
+            <p><strong>Details:</strong> ${
+              launch.details || "No details available"
+            }</p>
             <button onclick="removeFromFavorites('${favId}')">❌ Remove</button>
         `;
       favoritesContainer.appendChild(launchDiv);
@@ -407,18 +417,22 @@ async function loadUserFavorites() {
 }
 
 function removeFromFavorites(launchId) {
-    const username = localStorage.getItem("loggedInUser");
-    if (!username) return;
+  const username = localStorage.getItem("loggedInUser");
+  if (!username) return;
 
-    fetch("http://localhost:3000/favorites/remove", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, launchId })
+  fetch("http://localhost:3000/favorites/remove", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, launchId }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      alert(data.message);
+      showFavorites();
+      location.reload(); // Refresh the favorites list
     })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        showFavorites(); // Refresh the favorites list
-    })
-    .catch(() => alert("Error removing from favorites."));
+    .catch(() => {
+        alert("Error removing from favorites.");
+        location.reload();
+    });
 }
